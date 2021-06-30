@@ -64,6 +64,11 @@ Route::group(['middleware'=>['AdminAuth']],function(){
 	Route::get('admin/edit/{id}','App\Http\Controllers\AdminController@edit');
 	Route::get('admin/delete/{id}','App\Http\Controllers\AdminController@destroy');
 	Route::post('admin/updateEmployee','App\Http\Controllers\AdminController@update');
+	Route::get('admin/export/', 'App\Http\Controllers\AdminController@export');
+	Route::get('admin/export_excel/', 'App\Http\Controllers\UsersController@export');
+	Route::view('admin/import/', 'admin/import');
+	Route::get('admin/exportpdf/{id}', 'App\Http\Controllers\pdfController@export');
+	Route::post('admin/upload_file', 'App\Http\Controllers\AdminController@upload_file');
 
 
 	

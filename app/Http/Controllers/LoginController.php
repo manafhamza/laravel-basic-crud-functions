@@ -15,19 +15,13 @@ class LoginController extends Controller
     {
         $username = $request->username;
         $password = $request->password;
-
-        //check for the username
-        $employee = DB::table('employees')->where(['userName'=>$username])->first();
-        // dump($employee); 
+        $employee = Employee::where(['userName'=>$username])->first();
         if($employee)
         {
-            // if username exists.
-
             if(password_verify($password,$employee->password))
             {
                 $request->session()->put(['eid'=>$employee->id]);
                 return redirect('employee/dashboard'); 
-
             }
             else
             {
@@ -36,28 +30,20 @@ class LoginController extends Controller
         }
         else
         {
-            // if username does not exists.
                  return redirect()->back()->with('failed','Invalid User');
-             
         }
     }
     public function admin(Request $request)
     {
-
         $username = $request->username;
         $password = $request->password;
-        
-        //check for the username
-        $admin = DB::table('admin')->where(['userName'=>$username])->first();
+        $admin = Admin::where(['userName'=>$username])->first();
         if($admin)
         {
-        	// if username exists.
-
         	if(password_verify($password,$admin->password))
         	{
         		$request->session()->put(['aid'=>$admin->id]);
 				return redirect('admin/dashboard'); 
-
         	}
         	else
         	{
@@ -66,13 +52,7 @@ class LoginController extends Controller
         }
         else
         {
-        	// if username does not exists.
                  return redirect()->back()->with('failed','Invalid User');
-        	 
         }
-        
-        
     }
-
-
 }

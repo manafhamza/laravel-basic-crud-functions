@@ -1,7 +1,7 @@
 @extends('admin/layout')
 @section('main')
 
-	<div class="main-panel">
+  <div class="main-panel">
       <!-- Navbar -->
       <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
         <div class="container-fluid">
@@ -45,37 +45,42 @@
           <div class="row">
             <div class="col-md-12">
               <div class="card">
+                @foreach($employees as $employee)
                 <div class="card-header card-header-primary">
                     
-                  <h4 class="card-title " style="text-align: center;">{{$employee[0]->firstName.' '.$employee[0]->lastName.' - '.$employee[0]->id}}</h4>
+                  <h4 class="card-title " style="text-align: center;">{{$employee->firstName.' '.$employee->lastName.' - '.$employee->id}}
+                    <div style="float: right;"><a href="{{url('admin/exportpdf/'.$employee->id)}}" ><span class="material-icons">picture_as_pdf
+</span></a></div>
+                  </h4>
                   
                    
                 </div>
+                @endforeach
                 <div class="card-body">
                     <div id="typography">
-		                <div class="card-title">
+                    <div class="card-title">
                       <h3>Personal Details</h3>
  
-		                </div>
-		                <div class="row">
-		                	<div class="tim-typo col-md-6">
-		                		 
-		                      <span class="tim-note">Username</span> {{$employee[0]->userName}}   
-		                		 
-		                  	</div>
-		                  	<div class="tim-typo ">
-		                      <span class="tim-note">Address</span> {{$employee[0]->address}}
-		                  	</div>
-		                  	<div class="tim-typo col-md-6">
-		                      <span class="tim-note">Email</span> {{$employee[0]->email}}   
-		                  	</div>
-		                  	<div class="tim-typo col-md-6">
-		                      <span class="tim-note">Gender</span> @if($employee[0]->gender == 0) Female @else Male  @endif
-		                  	</div>
+                    </div>
+                    <div class="row">
+                      <div class="tim-typo col-md-6">
+                         
+                          <span class="tim-note">Username</span> {{$employee->userName}}   
+                         
+                        </div>
+                        <div class="tim-typo ">
+                          <span class="tim-note">Address</span> {{$employee->address}}
+                        </div>
+                        <div class="tim-typo col-md-6">
+                          <span class="tim-note">Email</span> {{$employee->email}}   
+                        </div>
+                        <div class="tim-typo col-md-6">
+                          <span class="tim-note">Gender</span> @if($employee->gender == 0) Female @else Male  @endif
+                        </div>
                         <div class="tim-typo col-md-6">
                           <span class="tim-note">Date of Birth</span> 
                           @php
-                            $dob = strtotime($employee[0]->birthDate);
+                            $dob = strtotime($employee->birthDate);
                             $dob = date('d-M-Y',$dob);
 
                           @endphp
@@ -84,45 +89,44 @@
                         <div class="tim-typo col-md-6">
                           <span class="tim-note">Date of Hiring</span>
                           @php
-                            $doh = strtotime($employee[0]->hireDate);
+                            $doh = strtotime($employee->hireDate);
                             $doh = date('d-M-Y',$doh);
 
                           @endphp
                            {{$doh}}
                         </div>
                         <div class="tim-typo col-md-6">
-                          <span class="tim-note">Salary</span> {{$employee[0]->salary}}
+                          <span class="tim-note">Salary</span> {{$employee->salary}}
                         </div>
                         <div class="tim-typo col-md-6">
-                          <span class="tim-note">Phone</span> {{$employee[0]->phone}}
+                          <span class="tim-note">Phone</span> {{$employee->phone}}
                         </div>
                         <div class="tim-typo col-md-6">
                           <span class="tim-note">Created On</span>
                           @php
-                            $created_at = strtotime($employee[0]->created_at);
+                            $created_at = strtotime($employee->created_at);
                             $created_at = date('d-M-Y H:i:s',$created_at);
 
                           @endphp
                           {{$created_at}}
                         </div>
                         <div class="tim-typo col-md-6">
-                          <span class="tim-note">Last Updated On</span> @if($employee[0]->updated_at == NULL)Not Updated yet @else {{$employee[0]->updated_at}} @endif
+                          <span class="tim-note">Last Updated On</span> @if($employee->updated_at == NULL)Not Updated yet @else {{$employee->updated_at}} @endif
                         </div>
-		                </div>
-                        <div class="card-title">
-                          
-                          @if(!empty($experience))
-                            @if(count($experience) == 0)
-                            <h3>No Previous Experience Added</h3>
-                            @else
+                    </div>
+                    
+                        @if(count($experience)>0)
+                         <div class="card-title">
                             <h3>Previous Experience </h3>
-                            @endif
-                          @endif
-
                         </div>
+                        @else
+                        <div class="card-title">
+                            <h5>No Previous Experience Added</h5>
+                        </div>
+
                         <br>
-                        {{-- {{dump($experience)}} --}}
-                        @if(count($experience) > 0)
+                        @endif
+                        
                         @foreach($experience as $value)
                         
                         <div class="row" style="border:solid 1px #d3d3d3; margin-top: 10px;border-radius: 5px;">
@@ -137,22 +141,18 @@
                           </div>
                         </div>
                         @endforeach
-                        @endif
-
+ 
+                        @if(count($family) > 0 )
                          <div class="card-title">
-                          
-                          @if(!empty($family))
-                            @if(count($family) == 0)
-                            <h3>No Previous Family Details Added</h3>
-                            @else
                             <h3>Family Members </h3>
-                            @endif
-                          @endif
-
+                        </div>
+                        @else
+                        <div class="card-title">
+                            <h5>No Family Members Added </h5>
                         </div>
                         <br>
-                        {{-- {{dump($experience)}} --}}
-                        @if(count($family) > 0)
+                        @endif
+                         
                         @foreach($family as $value)
                         
                         <div class="row" style="border:solid 1px #d3d3d3; margin-top: 10px;border-radius: 5px;">
@@ -167,10 +167,11 @@
                           </div>
                         </div>
                         @endforeach
-                        @endif
-                     
-		            </div>
+                        
+                      
                 </div>
+                </div>
+                
               </div>
             </div>
              

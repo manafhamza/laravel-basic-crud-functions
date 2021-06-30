@@ -5,6 +5,14 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\Admin;
+use App\Models\Employee;
+use App\Models\Family;
+use App\Models\Experience;
+
+use App\Exports\UsersExport;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\UsersImport;
+
 use DB;
 
 class AdminController extends Controller
@@ -17,36 +25,21 @@ class AdminController extends Controller
     public function index()
     {
         $aid = session()->get('aid');
-        $data = DB::table('admin')->where(['id'=>$aid])->first();
-        //var_dump($data);die;
+        $data = Admin::where(['id'=>$aid])->first();
         $result= array('username' => $data->userName , 'firstname'=>$data->firstName, 'lastname' =>$data->lastName, 'email' => $data->email);
-         
-         //dump($result);die;
-        
-       return view('/admin/dashboard',$result);
-         
-
+        return view('/admin/dashboard',$result);
     }
     public function employees()
     {
-        $result['employees'] = DB::table('employees')->get();
-        // dump($result);die;
+        $result['employees'] = Employee::all();
+        
         return view('admin/employees',$result);
     }
-   
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create(Request $request)
+    public function export()
     {
-        
-
-
-
+        $result['employees'] = Employee::all();
+        return view('admin/export',$result);
     }
-
     /**
      * Store a newly created resource in storage.
      *
@@ -67,19 +60,14 @@ class AdminController extends Controller
         $phone =  $request->phone;
         $salary =  $request->salary;
         $date = Carbon::now();
-
-
         $data = array('firstName' => $fname , 'lastName' =>$lname, 'address'=>$address, 'userName'=>$username,'password'=>$password,'email'=>$email,'gender'=>$gender,'birthDate'=>$dob,'hireDate'=>$doh,'phone'=>$phone,'salary'=>$salary, 'created_at'=>$date);
-        //dump($data);
-
-        if(DB::table('employees')->insert($data))
+        if(Employee::insert($data))
         {
             return redirect('admin/employees')->with('success','Employee has been Added Successfully');
         }
         else
         {
             return redirect()->back()->with('failed','System Error');
-
         }
     }
 
@@ -91,57 +79,20 @@ class AdminController extends Controller
      */
     public function show($id)
     {
-        $result = DB::table('employees')->where(['id' => $id])->get();
+        // $result = DB::table('employees')->where(['id' => $id])->get();
+        $result = Employee::where(['id' => $id])->get();
         if($result)
         {
-            $emp  = array();
-            foreach ($result as $key => $value)
-            // {
-            //     $emp['id']= $value['id'];
-            //     $emp['fname']= $value['$firstName']; 
-            //     $emp['lname']= $value['lastName'];
-            //     $emp['address']= $value['address'];
-            //     $emp['username']= $value['userName']; 
-            //     $emp['email']= $value['email'];
-            //     $emp['gender']= $value['gender'];
-            //     $emp['dob']= $value['birthDate'];
-            //     $emp['doh']= $value['hireDate'];
-            //     $emp['phone']= $value['phone']; 
-            //     $emp['salary']= $value['salary'];
-            //     $emp['created_at']= $value['created_at'];
-            //     $emp['updated_at']= $value['updated_at'];
-            // }
-            ///$result = json_encode($result);
-            //dump($result);
-
-            //echo $id;
-            //echo $result->firstName;
-             
-             // $employee= array('id'=>$id,'fname' => $firstName, 'lname'=>$lastName,'address'=>$address,'username'=>$userName, 'email'=>$email,'gender'=>$gender,'dob'=>birthDate,'doh'=>$hireDate,'phone'=>$phone, 'salary'=>$salary,'created_at'=>$created_at,'updated_at'=>$updated_at);
-           
-            // dump($experience);die;
-             
-            // $employee= array('id'=>$result->id,'fname' => $result->firstName, 'lname'=>$result->lastName,'address'=>$result->address,'username'=>$result->userName, 'email'=>$result->email,'gender'=>$result->gender,'dob'=>$result->birthDate,'doh'=>$result->hireDate,'phone'=>$result->phone, 'salary'=>$result->salary,'created_at'=>$result->created_at,'updated_at'=>$result->updated_at);
-            // dump($employee);
- 
-            $experience =  DB::table('previous_experience')->where(['empId' => $id])->get();
-            //dump($employee);
-            //dump($experience);
-            
-            $family =  DB::table('family_members')->where(['empId' => $id])->get();
-            $data = array('employee'=>$result,'experience'=>$experience,'family'=>$family);
-           // dump($family);die;
+            $data['employees'] = Employee::where(['id'=>$id])->get();
+            $data['experience'] =  Experience::where(['empId' => $id])->get();
+            $data['family'] =  Family::where(['empId' => $id])->get();
             return view('admin/employeeProfile',$data);
-
-            // $experience = array('experienceTitle'=>$result->experienceTitle,'years'=>$result->years,'months'=>$result->months,'employer'=>$result->employer );
         }
         else
         {
             return redirect('admin/employees')->with('failed','Invalid Employee Selected');
-
         }
     }
-
     /**
      * Show the form for editing the specified resource.
      *
@@ -150,20 +101,16 @@ class AdminController extends Controller
      */
     public function edit($id)
     {
-        $result = DB::table('employees')->where(['id' => $id])->first();
+        $result = Employee::where(['id' => $id])->first();
         if($result)
         {
-           
         $employee= array('id'=>$result->id,'fname' => $result->firstName, 'lname'=>$result->lastName,'address'=>$result->address,'username'=>$result->userName, 'email'=>$result->email,'gender'=>$result->gender,'dob'=>$result->birthDate,'doh'=>$result->hireDate,'phone'=>$result->phone, 'salary'=>$result->salary );
         return view('admin/editemployee', $employee); 
         }
         else
         {
             return redirect()->back()->with('failed','Invalid Employee');
-
         }
-        
-        
     }
 
     /**
@@ -189,7 +136,7 @@ class AdminController extends Controller
         $salary =  $request->salary;
         $date = Carbon::now();
         $data = array('firstName' => $fname , 'lastName' =>$lname, 'address'=>$address, 'userName'=>$username,'email'=>$email,'gender'=>$gender,'birthDate'=>$dob,'hireDate'=>$doh,'phone'=>$phone,'salary'=>$salary, 'updated_at'=>$date);
-        if(DB::table('employees')->where(['id'=> $request->id])->update($data))
+        if(Employee::where(['id'=> $request->id])->update($data))
         {
             return redirect('admin/employees')->with('success','Employee has been Updated Successfully');
         }
@@ -198,8 +145,6 @@ class AdminController extends Controller
             return redirect()->back()->with('failed','System Error');
 
         }
-
-
     }
 
     /**
@@ -210,7 +155,7 @@ class AdminController extends Controller
      */
     public function destroy($id)
     {
-        if(DB::table('employees')->where('id', $id)->delete())
+        if(Employee::where('id', $id)->delete())
         {
             return redirect('admin/employees')->with('success','Employee has been Deleted Successfully');
         }
@@ -219,5 +164,22 @@ class AdminController extends Controller
             return redirect()->back()->with('failed','System Error');
 
         }
+    }
+    public function upload_file(Request $request)
+    {
+        $file = $request->file('fileinput');
+        if($file)
+        {
+            $file_name='users.xlsx';
+            $path =public_path().'/'.$file_name;
+            if(file_exists( $path))
+            {
+                unlink($path);
+            }
+            $file->move(public_path(), $file_name);
+        }
+        Excel::import(new UsersImport, 'users.xlsx');
+        return redirect('admin/employees')->with('success', 'The Employees has been Added Successfully');
+
     }
 }

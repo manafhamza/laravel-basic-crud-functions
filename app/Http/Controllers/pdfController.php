@@ -18,7 +18,7 @@ class pdfController extends Controller
         $data['experience'] =  DB::table('previous_experience')->where(['empId' => $id])->get();
         // $data['experience'] =  Experience::where(['empId' => $id])->get();
         $data['family'] =  DB::table('family_members')->where(['empId' => $id])->get();
-        $pdf = PDF::loadView('admin/exportpdf',$data);
+        $pdf = PDF::loadView('admin/exportPdf',$data);
         //$pdf->setPaper('A4', 'landscape');
         return $pdf->download('employees.pdf');
         return view('admin/exportpdf',$data);

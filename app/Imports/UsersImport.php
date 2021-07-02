@@ -2,13 +2,13 @@
 
 namespace App\Imports;
 
-use App\models\Employee;
 use DB;
 use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Concerns\ToModel;
 // use Maatwebsite\Excel\Concerns\WithStartRow;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Facades\Excel;
+use App\models\Employee;
 
 
 use Carbon\Carbon;

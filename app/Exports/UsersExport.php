@@ -17,7 +17,7 @@ class UsersExport implements FromCollection, WithHeadings
     {	
 
 
-        return DB::table('employees')->select('id','firstName','lastName','userName','address','email',(DB::raw('CASE WHEN gender = 0 THEN "Female" ELSE "Male" END')),'birthDate','hireDate','salary','phone','created_at','updated_at')->get();
+        return DB::table('employees')->select('id','firstName','lastName','userName','address','email',(DB::raw("CASE WHEN gender = 0 THEN 'Female' ELSE 'Male' END")),'birthDate','hireDate','salary','phone','created_at','updated_at')->get();
     }
     public function headings(): array
     {

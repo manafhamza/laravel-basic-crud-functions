@@ -53,6 +53,7 @@ class AdminController extends Controller
         $address =  $request->address;
         $username =  $request->username;
         $password =  $request->password;
+        $password =  password_hash($password, PASSWORD_DEFAULT);
         $email =  $request->email;
         $gender =  $request->gender;
         $dob =  $request->dob;

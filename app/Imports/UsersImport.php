@@ -10,6 +10,7 @@ use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Facades\Excel;
 
+
 use Carbon\Carbon;
 
 class UsersImport implements ToModel, WithHeadingRow
@@ -26,8 +27,8 @@ class UsersImport implements ToModel, WithHeadingRow
  //date('Y-m-d',\PhpOffice\PhpSpreadsheet\Shared\Date::excelToTimestamp($row['birthdate']))
         return new Employee([
             
-             'firstName' =>  'firstname',
-             // 'firstName' =>  $row['firstname'],
+             // 'firstName' =>  'firstname',
+             'firstName' =>  $row['firstname'],
             'lastName' =>  $row['lastname'],
             'userName' =>  $row['username'],
             'password' => Hash::make($row['password']),
